@@ -230,11 +230,11 @@ if __name__ == "__main__":
 
     '''AD VS NC'''
 
-    train_data_path = './data/train.csv'
-    val_data_path = './data/val.csv'
+    train_data_path = './data/train_ADCN.csv'
+    val_data_path = './data/val_ADCN.csv'
 
-    train_img_path = r'./data/train/'
-    val_img_path = r'./data/val/'
+    train_img_path = r'./data/'
+    val_img_path = r'./data/'
 
     train_data = AdniDataSet(train_data_path, train_img_path, sets)
     val_data = AdniDataSet(val_data_path, val_img_path, sets)
