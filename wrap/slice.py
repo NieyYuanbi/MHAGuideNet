@@ -93,9 +93,9 @@ class Advanced_Block(nn.Module):
         # out = self.relu(out)
 
         return xo
-class GFM(nn.Module):
+class Slice(nn.Module):
     def __init__(self, block, blocks_num, num_classes=2, include_top=True):
-        super(GFM, self).__init__()
+        super(Slice, self).__init__()
         self.include_top = include_top
         self.in_channel = 64
 
@@ -159,21 +159,3 @@ class GFM(nn.Module):
 
 
         return x
-
-if __name__ == "__main__":
-    import torch
-
-    # 创建GFM模型
-    model = GFM(BasicBlock, blocks_num=[2, 2, 2])
-
-    # 打印模型结构
-    # print(model)
-
-    # 示例输入
-    input_tensor = torch.randn(10, 1, 96, 96)
-
-    # 使用模型进行前向传播
-    output_tensor = model(input_tensor)
-
-    # 打印输出 tensor 的形状
-    print("Output Shape:", output_tensor.shape)
