@@ -105,8 +105,7 @@ class FirstNet(nn.Module):
         self.layer4.add_module('relu4', nn.ReLU(inplace=True))
         self.layer4.add_module('max_pooling4', nn.MaxPool3d(kernel_size=5, stride=2))
 
-        # self.fc = nn.Sequential()
-        # self.fc1 = nn.Linear(512+128*3, 256)
+
         self.fc1 = nn.Linear(512, 256)
         self.fc2 = nn.Linear(256, 64)
         self.fc3 = nn.Linear(64, 2)
@@ -121,14 +120,12 @@ class FirstNet(nn.Module):
         x1 = self.layer3(x1)
         x1 = self.layer4(x1)
         x1 = self.avgpool(x1)
-        x1 = x1.view(x1.shape[0], -1) #16 512
-        # x1 = self.fc1(x1)
-        # x1 = self.fc2(x1)
-        # x1 = self.fc3(x1)
+        x1 = x1.view(x1.shape[0], -1)
+
         return x1
-# Define your 2D CNN model
+
 class My2DModel(nn.Module):
-    # Define your 2D model architecture
+
     def __init__(self, f=8):
         super(My2DModel, self).__init__()
 
@@ -160,25 +157,22 @@ class My2DModel(nn.Module):
         attention_x2 = attention_x2.reshape((attention_x2.shape[0], -1))
         attention_x3 = attention_x3.reshape((attention_x3.shape[0], -1))
 
-        attention_x1 = self.fc_att1(attention_x1) #16 128
+        attention_x1 = self.fc_att1(attention_x1)
         attention_x2 = self.fc_att2(attention_x2)
         attention_x3 = self.fc_att3(attention_x3)
 
-        x1 = torch.cat((attention_x1, attention_x2, attention_x3), 1) #16 384
-        # print("x1shape, attentionx1sghape, attentionx2sghape, attentionx2sghape, ", x1.shape, attention_x1.shape, attention_x2.shape, attention_x3.shape)
+        x1 = torch.cat((attention_x1, attention_x2, attention_x3), 1)
+
 
         return attention_x1, attention_x2, attention_x3
 
-# Define an integrated model that guides 2D model with 3D features using attention mechanism
 class IntegratedModel(nn.Module):
     def __init__(self, model_2d, model_3d):
         super(IntegratedModel, self).__init__()
         self.model_2d = model_2d
         self.model_3d = model_3d
-        # Define linear layer for guidance
 
-        self.attention_layer = nn.Linear(512, 128) # 第一个是3D的输出，第二个是2D的输出
-        # Define multi-head attention layer
+        self.attention_layer = nn.Linear(512, 128) 
         self.multihead_attention = nn.MultiheadAttention(embed_dim=128, num_heads=4)
 
         self.fc1 = nn.Linear(384, 256)
@@ -187,37 +181,22 @@ class IntegratedModel(nn.Module):
 
     def forward(self, x_2d_1, x_2d_2, x_2d_3, x_3d):
 
-        # Pass the 3D input through the 3D model
         feature_3d = x_3d
         feature_2d_1 = x_2d_1
         feature_2d_2 = x_2d_2
         feature_2d_3 = x_2d_3
 
-        # Use linear layer for guidance/ choose one
-        # guidance_linear = torch.sigmoid(self.attention_layer(feature_3d))
         guidance_linear = torch.softmax(self.attention_layer(feature_3d), dim=-1)
-
-        # print("guidance_linear shape is:", guidance_linear.shape)
-
-        # Expand dimensions of feature_3d to match (seq_len, batch_size, embed_dim) for multihead_attention
         feature_3d_expanded = guidance_linear.unsqueeze(0)
-        # print("feature_3d_expanded shape is:", feature_3d_expanded.shape)
 
-        # Apply multi-head attention mechanism
         attention_output, _ = self.multihead_attention(feature_3d_expanded, feature_3d_expanded, feature_3d_expanded)
-        # print("attention_output shape is:", attention_output.shape)
 
-
-        # 结合2D特征和注意力输出
-        # guided_feature_2d = feature_2d * (guidance_linear + attention_output.squeeze(0))
         guided_feature_2d_1 = feature_2d_1 * attention_output.squeeze(0)
         guided_feature_2d_2 = feature_2d_2 * attention_output.squeeze(0)
         guided_feature_2d_3 = feature_2d_3 * attention_output.squeeze(0)
 
         guided_feature = torch.cat((guided_feature_2d_1, guided_feature_2d_2, guided_feature_2d_3), 1)
-        # print("guided feature is:", guided_feature.shape)
 
-        # 后续的全连接层
         x1 = self.fc1(guided_feature)
         x1 = self.fc2(x1)
         x1 = self.fc3(x1)
@@ -238,7 +217,6 @@ if __name__ == "__main__":
 
     train_data = AdniDataSet(train_data_path, train_img_path, sets)
     val_data = AdniDataSet(val_data_path, val_img_path, sets)
-    """将训练集划分为训练集和验证集"""
 
     print('train:', len(train_data), 'validation:', len(val_data))
 
@@ -250,7 +228,7 @@ if __name__ == "__main__":
     model_2d = My2DModel(f=8)
     model_3d = FirstNet(f=8)
     state_dict = torch.load('your 3d model checkpoint')
-    # 移除 "module." 前缀
+
     new_state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
     model_3d.load_state_dict(new_state_dict)
     model_3d.to(device)
@@ -258,7 +236,6 @@ if __name__ == "__main__":
     model = IntegratedModel(model_2d, model_3d)
     model = torch.nn.DataParallel(model)
 
-    # print(model)
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.01)
     early_stopping = EarlyStopping(patience=40, verbose=True)
@@ -276,7 +253,7 @@ if __name__ == "__main__":
         running_loss = 0
 
         for i, data in tqdm(enumerate(train_loader), total=len(train_loader)):
-            #inputs为原始3Dimages, patch123是三个方向的切片
+           
             inputs, patch1, patch2, patch3, labels = data
             inputs, patch1, patch2, patch3, labels = inputs.to(device), patch1.to(device), patch2.to(device), patch3.to(device), labels.to(device)
             optimizer.zero_grad()
@@ -360,15 +337,15 @@ if __name__ == "__main__":
             recall = acc_num / target_num
             precision = acc_num / predict_num
             F1 = 2 * recall * precision / (recall + precision)
-            # 精度调整
+        
             recall = (recall.numpy()[0] * 100).round(3)
             precision = (precision.numpy()[0] * 100).round(3)
             F1 = (F1.numpy()[0] * 100).round(3)
 
             print(roc_label)
             print(roc_predict)
-            fpr, tpr, threshold = roc_curve(roc_label, roc_predict, pos_label=1)  ###计算真正率和假正率
-            roc_auc = auc(fpr, tpr)  ###计算auc的值
+            fpr, tpr, threshold = roc_curve(roc_label, roc_predict, pos_label=1)  
+            roc_auc = auc(fpr, tpr) 
 
             print("The accuracy of valid {} images: {}%".format(total, 100 * correct / total))
             print(
@@ -376,7 +353,7 @@ if __name__ == "__main__":
             result_list.append(
                 [epoch, train_loss, val_loss, correct / total, recall[0], precision[0], F1[0], roc_auc, recall[1], precision[1], F1[1]])
 
-            # 输入日志
+        
             name = ['epoch', 'train_loss', 'val_loss', 'val_acc', 'recall', 'precision', 'F1', 'AUC', 'recall1', 'precision1', 'F11']
             result = pd.DataFrame(columns=name, data=result_list)
 
