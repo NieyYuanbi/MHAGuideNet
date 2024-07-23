@@ -129,9 +129,9 @@ class My2DModel(nn.Module):
     def __init__(self, f=8):
         super(My2DModel, self).__init__()
 
-        self.single_list1 = nn.ModuleList([GFM(BasicBlock, blocks_num=[2, 2, 2]) for i in range(40)])
-        self.single_list2 = nn.ModuleList([GFM(BasicBlock, blocks_num=[2, 2, 2]) for i in range(40)])
-        self.single_list3 = nn.ModuleList([GFM(BasicBlock, blocks_num=[2, 2, 2]) for i in range(40)])
+        self.single_list1 = nn.ModuleList([Slice(BasicBlock, blocks_num=[2, 2, 2]) for i in range(40)])
+        self.single_list2 = nn.ModuleList([Slice(BasicBlock, blocks_num=[2, 2, 2]) for i in range(40)])
+        self.single_list3 = nn.ModuleList([Slice(BasicBlock, blocks_num=[2, 2, 2]) for i in range(40)])
 
 
         self.fc_att1 = nn.Linear(40 * 8, 128)
