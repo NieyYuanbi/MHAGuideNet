@@ -12,22 +12,22 @@ def parse_opts():
         '--data_root',
         default='./data',
         type=str,
-        help='Root directory path of data')  #数据的根目录
+        help='Root directory path of data')  
     parser.add_argument(
         '--img_list',
         default='./data/train.txt',
         type=str,
-        help='Path for image list file')   #训练图片的路径txt
+        help='Path for image list file')   
     parser.add_argument(
         '--validation_list',
         default='./data/validation.txt',
         type=str,
-        help='Path for image list file')  #验证集的路径txt
+        help='Path for image list file') 
     parser.add_argument(
         '--test_list',
         default='./data/test.txt',
         type=str,
-        help='Path for image list file')  #测试集的路径txt
+        help='Path for image list file')  
     parser.add_argument(
         '--n_seg_classes',
         default=2,
@@ -35,7 +35,7 @@ def parse_opts():
         help="Number of segmentation classes"
     )
     parser.add_argument(
-        '--learning_rate',  # set to 0.001 when finetune
+        '--learning_rate',  
         default=0.001,
         type=float,
         help=
@@ -48,7 +48,7 @@ def parse_opts():
     parser.add_argument(
         '--batch_size', default=1, type=int, help='Batch Size')
     parser.add_argument(
-        '--phase', default='test', type=str, help='Phase of train or test')  ##指定是训练阶段还是测试阶段
+        '--phase', default='test', type=str, help='Phase of train or test')  
     parser.add_argument(
         '--save_intervals',
         default=10,
@@ -83,7 +83,7 @@ def parse_opts():
     )
     parser.add_argument(
         '--pretrain_path',
-        default='pretrain/resnet_10_23dataset.pth', ## 与预训练网络的路径
+        default='pretrain/resnet_10_23dataset.pth',
         type=str,
         help=
         'Path for pretrained model.'
