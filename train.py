@@ -9,7 +9,7 @@ from datetime import datetime
 from sklearn.metrics import roc_curve, auc
 from torch import nn
 import torch
-from wrap.GFM import GFM, BasicBlock
+from wrap.slice import Slice, BasicBlock
 import torchvision.models as models
 import numpy as np
 
